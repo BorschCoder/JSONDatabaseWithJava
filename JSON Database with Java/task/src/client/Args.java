@@ -2,22 +2,20 @@ package client;
 
 import com.beust.jcommander.Parameter;
 
-import java.io.File;
-
 public class Args {
-    @Parameter(names = {"--requestType","-t"})
+    @Parameter(names = {"--requestType", "-t"})
     private String requestType;
-    @Parameter(names = {"--index","-k"})
+    @Parameter(names = {"--index", "-k"})
     private String index;
-    @Parameter(names = {"--value","-v"})
+    @Parameter(names = {"--value", "-v"})
     private String value;
+    @Parameter(names = {"--file", "-in"})
+    private String file;
 
-    public String getJson() {
-        return json;
+    public String getFile() {
+        return file;
     }
 
-    @Parameter(names = {"--json","-in"})
-    private String json;
     public String getRequestType() {
         return requestType;
     }
@@ -28,5 +26,10 @@ public class Args {
 
     public String getValue() {
         return value;
+    }
+
+
+    public Args() {
+
     }
 }

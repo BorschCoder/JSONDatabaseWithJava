@@ -3,10 +3,13 @@ package client;
 import com.beust.jcommander.JCommander;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 
 public class Main {
@@ -14,7 +17,7 @@ public class Main {
     static final int port = 23456;
     public static final String SENT_LABEL = "Sent: ";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Args arguments = new Args();
         JCommander.newBuilder()
@@ -24,19 +27,26 @@ public class Main {
 
         Gson gson = new Gson();
 
-        try {
-            Socket socket = new Socket(InetAddress.getByName(address), port);
+        try (Socket socket = new Socket(InetAddress.getByName(address), port)) {
             System.out.println("Client started!");
 
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
             RequestType requestType = RequestType.valueOf(arguments.getRequestType().toUpperCase());
+            Request request = null;
+
+            if (requestType == RequestType.IN) {
+                String argFile = arguments.getFile();
+                if (argFile != null) {
+                    try (BufferedReader reader = Files.newBufferedReader(Paths.get(argFile))) {
+                        request = gson.fromJson(reader, Request.class);
+                    }
+                }
+            }
             String key = arguments.getIndex();
 
 
-
-            Request request;
             switch (requestType) {
 
                 case SET:
@@ -44,6 +54,8 @@ public class Main {
                     break;
                 case GET, DELETE:
                     request = new Request(requestType, key);
+                    break;
+                case IN:
                     break;
                 default:
                     request = new Request(requestType);
@@ -55,9 +67,7 @@ public class Main {
 
             String answer = input.readUTF();
             System.out.println("Received: " + answer);
-            if (arguments.getRequestType().equals("exit")) {
-                socket.close();
-            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

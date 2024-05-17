@@ -4,6 +4,7 @@ public enum RequestType {
     SET("set"),
     GET("get"),
     DELETE("delete"),
+    IN("in"),
     EXIT("exit");
 
     private final String type;
