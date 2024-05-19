@@ -16,23 +16,26 @@ import static server.ResponseType.OK;
 
 public class Server {
     private final ExecutorService executor;
-    private final FileDB fileDB;
-    private volatile boolean running;
+    private final EntityService entityService;
+    private ServerSocket server;
     private final int port;
 
+    private EntityController controller;
+
     public Server(int port) {
-        this.fileDB = new FileDB();
-        this.running = true;
+        this.entityService = new EntityService();
         this.port = port;
         this.executor = Executors.newCachedThreadPool();
+        this.controller = new EntityController();
 
     }
 
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            while (running) {
+        try {
+            server = new ServerSocket(port);
+            while (!server.isClosed()) {
+                Socket socket = server.accept();
 
-                Socket socket = serverSocket.accept();
                 executor.submit(() -> {
 
                     try (DataInputStream input = new DataInputStream(socket.getInputStream());
@@ -47,11 +50,12 @@ public class Server {
                         if (method.equals("exit")) {
                             response = close();
                         } else {
-                            response = fileDB.requestHandler(request);
+                            response = controller.handle(request);
                         }
 
                         String textResponse = new Gson().toJson(response).toString();
                         output.writeUTF(textResponse);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -67,7 +71,11 @@ public class Server {
 
     public Response close() {
         this.executor.shutdown();
-        this.running = false;
+        try {
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return new Response(OK);
     }
 

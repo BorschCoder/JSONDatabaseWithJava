@@ -4,10 +4,11 @@ import com.beust.jcommander.JCommander;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -16,6 +17,17 @@ public class Main {
     static final String address = "127.0.0.1";
     static final int port = 23456;
     public static final String SENT_LABEL = "Sent: ";
+
+    public static final String REQUEST_DIR = "/Users" +
+            "/mihail" +
+            "/IdeaProjects" +
+            "/JSON Database with Java" +
+            "/JSON Database with Java" +
+            "/task" +
+            "/src" +
+            "/client" +
+            "/data" +
+            "/";
 
     public static void main(String[] args) {
 
@@ -33,24 +45,35 @@ public class Main {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
-            RequestType requestType = RequestType.valueOf(arguments.getRequestType().toUpperCase());
+            RequestType requestType = null;
             Request request = null;
+            String key = null;
+            String value = null;
 
-            if (requestType == RequestType.IN) {
+            if (arguments.getFile() != null) {
                 String argFile = arguments.getFile();
                 if (argFile != null) {
-                    try (BufferedReader reader = Files.newBufferedReader(Paths.get(argFile))) {
+                    String filePath = REQUEST_DIR + argFile;
+                    try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+
                         request = gson.fromJson(reader, Request.class);
+                        key = request.getKey();
+                        value = request.getValue();
+                        requestType = RequestType.valueOf(request.getType().toUpperCase());
+
                     }
                 }
+            } else {
+                requestType = RequestType.valueOf(arguments.getRequestType().toUpperCase());
+                key = arguments.getIndex();
+                value = arguments.getValue();
             }
-            String key = arguments.getIndex();
 
 
             switch (requestType) {
 
                 case SET:
-                    request = new Request(requestType, key, arguments.getValue());
+                    request = new Request(requestType, key, value);
                     break;
                 case GET, DELETE:
                     request = new Request(requestType, key);

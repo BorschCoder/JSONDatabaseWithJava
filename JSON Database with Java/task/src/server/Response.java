@@ -20,6 +20,9 @@ public class Response implements Serializable {
     public Response(ResponseType response) {
         this.response = response;
     }
+    public Response( ) {
+
+    }
 
     public Response(ResponseType response, String reason, String value) {
         this.response = response;
