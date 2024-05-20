@@ -1,7 +1,5 @@
 package server;
 
-import client.Request;
-
 import static server.ResponseType.OK;
 
 public class EntityController {
@@ -12,23 +10,22 @@ public class EntityController {
         this.service = new EntityService();
     }
 
-    public Response handle(Request request) {
+    public Response handle(Entity entity) {
 
-        String method = request.getType();
-        String key = request.getKey();
-        String value = request.getValue();
+        String method = entity.getType();
+//        String key = entity.getKey();
 
         Response response = new Response();
         switch (method) {
             case "set" -> {
-                service.set(key, value, response);
+                service.set(entity, response);
                 response.setResponse(OK);
             }
             case "get" -> {
-                service.get(key, response);
+                service.get(entity, response);
             }
             case "delete" -> {
-                service.delete(key, response);
+                service.delete(entity, response);
             }
             default -> {
                 response.setResponse(OK);

@@ -1,6 +1,7 @@
 package client;
 
 public class Request {
+
     private final String type;
     private final String key;
     private final String value;
@@ -9,9 +10,9 @@ public class Request {
         this(type, keyValue, null);
     }
 
-    public Request(RequestType type, String keyValue, String setValue) {
+    public Request(RequestType type, String key, String setValue) {
         this.type = type.getType();
-        this.key = keyValue;
+        this.key = key;
         this.value = setValue;
     }
 

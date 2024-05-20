@@ -45,8 +45,8 @@ public class Main {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
+            Object request = null;
             RequestType requestType = null;
-            Request request = null;
             String key = null;
             String value = null;
 
@@ -54,36 +54,26 @@ public class Main {
                 String argFile = arguments.getFile();
                 if (argFile != null) {
                     String filePath = REQUEST_DIR + argFile;
+
+                    StringBuilder jsonString = new StringBuilder();
+
                     try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
-
-                        request = gson.fromJson(reader, Request.class);
-                        key = request.getKey();
-                        value = request.getValue();
-                        requestType = RequestType.valueOf(request.getType().toUpperCase());
-
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            jsonString.append(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    request = gson.fromJson(jsonString.toString(), Object.class);
                 }
             } else {
                 requestType = RequestType.valueOf(arguments.getRequestType().toUpperCase());
                 key = arguments.getIndex();
                 value = arguments.getValue();
+                request = new Request(requestType, key, value);
             }
 
-
-            switch (requestType) {
-
-                case SET:
-                    request = new Request(requestType, key, value);
-                    break;
-                case GET, DELETE:
-                    request = new Request(requestType, key);
-                    break;
-                case IN:
-                    break;
-                default:
-                    request = new Request(requestType);
-                    break;
-            }
             String message = gson.toJson(request).toString();
             System.out.println(SENT_LABEL + message);
             output.writeUTF(message);
@@ -95,6 +85,4 @@ public class Main {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -1,5 +1,7 @@
 package server;
 
+import com.google.gson.JsonElement;
+
 import java.util.List;
 
 import static server.ResponseType.ERROR;
@@ -14,29 +16,69 @@ public class EntityService {
     }
 
 
-    public synchronized void get(String key, Response response) {
+    public synchronized void get(Entity entity, Response response) {
 
-        List<Entity> list = repository.findAll();
-        Entity entity = list.stream().filter(t -> t.getKey().equals(key)).findFirst().orElse(new Entity("", ""));
+        List<String> keys = entity.getKeys();
+
+        List<Entry> list = repository.findAll();
+
+        Entry entry = list.stream().filter(e -> e.key.equals(keys.get(0)))
+                .findFirst()
+                .orElse(null);
 
         if (isInvalid(entity)) {
             response.setReason("No such key");
             response.setResponse(ERROR);
         } else {
-            response.setValue(entity.getValue());
+            JsonElement elem = entry.value;
+            for (int i = 1; i < keys.size(); i++) {
+                if (elem.isJsonObject()) {
+                    elem = elem.getAsJsonObject().get(keys.get(i));
+                } else if (elem.isJsonPrimitive()) {
+                    elem = elem.getAsJsonPrimitive();
+                }
+            }
+            response.setValue(elem);
             response.setResponse(OK);
         }
     }
 
-    public synchronized void set(String key, String value, Response response) {
-        List<Entity> list = repository.findAll();
+    public synchronized void set(Entity entity, Response response) {
+        List<String> keys = entity.getKeys();
+        List<Entry> list = repository.findAll();
 
-        Entity entity = list.stream().filter(t -> t.getKey().equals(key)).findFirst().orElse(new Entity("", ""));
+        Entry entry = list.stream().filter(e -> e.key.equals(keys.get(0)))
+                .findFirst()
+                .orElse(null);
 
-        if (isInvalid(entity)) {
-            list.add(new Entity(key, value));
+        if (entry == null) {
+            entry = new Entry();
+            entry.key = keys.get(0);
+            entry.value = entity.value;
+            list.add(entry);
         } else {
-            entity.setValue(value);
+
+            if (keys.size() >= 2) {
+                JsonElement value = entry.value;
+                for (int i = 1; i < keys.size() - 1; i++) {
+                    System.out.println(value);
+                    System.out.println(value.isJsonObject());
+                    if (value.isJsonObject()) {
+                        value = value.getAsJsonObject().get(keys.get(i));
+                    }
+                    System.out.println("i=" + i);
+                }
+
+                if (value.isJsonObject()) {
+                    if (entity.value.isJsonPrimitive()) {
+                        value.getAsJsonObject().addProperty(keys.get(keys.size() - 1), entity.value.getAsString());
+                    }
+                }
+
+            } else {
+                entry.value = entity.value;
+            }
+
         }
 
         repository.saveAll(list);
@@ -45,22 +87,35 @@ public class EntityService {
 
     }
 
-    public synchronized void delete(String key, Response response) {
-        List<Entity> list = repository.findAll();
+    public synchronized void delete(Entity entity, Response response) {
+        List<String> keys = entity.getKeys();
+        List<Entry> list = repository.findAll();
 
-        Entity entity = list.stream().filter(t -> t.getKey().equals(key)).findFirst().orElse(new Entity("", ""));
-
+        Entry entry = list.stream().filter(e -> e.key.equals(keys.get(0)))
+                .findFirst()
+                .orElse(null);
         if (isInvalid(entity)) {
             response.setReason("No such key");
             response.setResponse(ERROR);
         } else {
-            list.remove(entity);
-            response.setResponse(OK);
+            if (keys.size() >= 2) {
+                JsonElement elem = entry.value;
+                for (int i = 1; i < keys.size() - 1; i++) {
+                    if (elem.isJsonObject()) {
+                        elem = elem.getAsJsonObject().get(keys.get(i));
+                    }
+                }
+                elem.getAsJsonObject().remove(keys.get(keys.size() - 1));
+            } else {
+                list.remove(entry);
+            }
+
         }
+        response.setResponse(OK);
         repository.saveAll(list);
     }
 
     private boolean isInvalid(Entity entity) {
-        return entity == null || entity.getKey().isBlank() && entity.getValue().isBlank();
+        return entity == null || entity.getKeys().isEmpty();
     }
 }

@@ -1,13 +1,23 @@
 package server;
 
 
+import com.google.gson.JsonElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Entity {
 
 
-    private String key;
+    String type;
 
+    JsonElement key;
 
-    private String value;
+    public String getType() {
+        return type;
+    }
+
+    JsonElement value;
 
 
     @Override
@@ -18,25 +28,18 @@ public class Entity {
                 '}';
     }
 
-    public Entity(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
 
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public List<String> getKeys() {
+        List<String> list = new ArrayList<>();
+        if (key.isJsonArray()) {
+            for (JsonElement e : key.getAsJsonArray()) {
+                if (e.isJsonPrimitive()) {
+                    list.add(e.getAsString());
+                }
+            }
+        } else if (key.isJsonPrimitive()) {
+            list.add(key.getAsString());
+        }
+        return list;
     }
 }

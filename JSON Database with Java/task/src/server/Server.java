@@ -1,16 +1,14 @@
 package server;
 
-import client.Request;
 import com.google.gson.Gson;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static server.ResponseType.OK;
 
@@ -42,15 +40,15 @@ public class Server {
                          DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
 
                         String receivedMessage = input.readUTF();
-                        Request request = new Gson().fromJson(receivedMessage, (Type) Request.class);
 
-                        String method = request.getType();
+                        Entity entity = new Gson().fromJson(receivedMessage, Entity.class);
+                        String method = entity.getType();
                         Response response = null;
 
                         if (method.equals("exit")) {
                             response = close();
                         } else {
-                            response = controller.handle(request);
+                            response = controller.handle(entity);
                         }
 
                         String textResponse = new Gson().toJson(response).toString();

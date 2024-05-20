@@ -1,14 +1,16 @@
 package server;
 
+import com.google.gson.JsonElement;
+
 import java.io.Serializable;
 
 public class Response implements Serializable {
 
     private ResponseType response;
     private String reason;
-    private String value;
+    private JsonElement value;
 
-    public void setValue(String value) {
+    public void setValue(JsonElement value) {
         this.value = value;
     }
 
@@ -24,7 +26,7 @@ public class Response implements Serializable {
 
     }
 
-    public Response(ResponseType response, String reason, String value) {
+    public Response(ResponseType response, String reason, JsonElement value) {
         this.response = response;
         this.reason = reason;
         this.value = value;

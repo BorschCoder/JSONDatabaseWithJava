@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -32,8 +33,10 @@ public class EntityDAO {
         this.gson = new Gson().newBuilder().setPrettyPrinting().create();
     }
 
-    public List<Entity> findAll() {
-        List<Entity> entities = new ArrayList<>();
+    public List<Entry> findAll() {
+        List<Entry> entries = new ArrayList<>();
+
+        Type type = new TypeToken<ArrayList<Entry>>(){}.getType();
 
         StringBuilder jsonString = new StringBuilder();
         lock.readLock().lock();
@@ -48,22 +51,21 @@ public class EntityDAO {
         lock.readLock().unlock();
 
         if (jsonString.isEmpty() || jsonString.length() == 2) {
-            return entities;
+            return entries;
         }
-        entities = gson.fromJson(jsonString.toString(), new TypeToken<List<Entity>>() {
-        }.getType());
+        entries = gson.fromJson(jsonString.toString(), type);
 
-        return entities;
+        return entries;
     }
 
 
-    public void saveAll(List<Entity> entities) {
+    public void saveAll(List<Entry> entries) {
         lock.writeLock().lock();
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(DB_URL))) {
 
             StringBuilder jsonString = new StringBuilder();
-            jsonString.append(gson.toJson(entities, new TypeToken<List<Entity>>() {
+            jsonString.append(gson.toJson(entries, new TypeToken<List<Entity>>() {
             }.getType()));
 
             writer.write(jsonString.toString());

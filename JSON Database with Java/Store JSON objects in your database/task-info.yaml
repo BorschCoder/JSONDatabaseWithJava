@@ -817,28 +817,16 @@ files:
   - name: src/server/data/data.json
     visible: true
     learner_created: true
+  - name: src/server/Entry.java
+    visible: true
+    learner_created: true
+  - name: src/client/data/setFile.json
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/5495#comment
-status: Failed
+status: Solved
 feedback:
-  message: "Error in test #1\n\nIn this test, the program is running for a long time,\
-    \ more than 15 seconds. Most likely, the program has gone into an infinite loop.\n\
-    \nPlease find below the output of your program during this failed test.\n\n---\n\
-    \nArguments for Main: -t exit\n\nstdout:\nServer started!\n\nstderr:\njava.net.ConnectException:\
-    \ Connection refused\n\tat java.base/sun.nio.ch.Net.connect0(Native Method)\n\t\
-    at java.base/sun.nio.ch.Net.connect(Net.java:579)\n\tat java.base/sun.nio.ch.Net.connect(Net.java:568)\n\
-    \tat java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:588)\n\tat\
-    \ java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)\n\tat java.base/java.net.Socket.connect(Socket.java:633)\n\
-    \tat java.base/java.net.Socket.connect(Socket.java:583)\n\tat java.base/java.net.Socket.&lt;init&gt;(Socket.java:507)\n\
-    \tat java.base/java.net.Socket.&lt;init&gt;(Socket.java:319)\n\tat client.Main.main(Main.java:42)\n\
-    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\
-    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
-    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
-    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.hyperskill.hstest.testing.execution.MainMethodExecutor.invokeMain(MainMethodExecutor.java:160)\n\
-    \tat org.hyperskill.hstest.testing.execution.MainMethodExecutor.lambda$launch$1(MainMethodExecutor.java:188)\n\
-    \tat java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)\n\
-    \tat java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)\n\tat\
-    \ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)\n\
-    \tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)\n\
-    \tat java.base/java.lang.Thread.run(Thread.java:833)"
-  time: "Sun, 19 May 2024 18:54:51 UTC"
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Mon, 20 May 2024 21:22:53 UTC"
 record: -1
